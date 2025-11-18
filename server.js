@@ -6,7 +6,7 @@ require('dotenv').config();
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173']
+  origin: [`${process.env.RAILWAY_FRONTEND_URL}`]
 }));
 app.use(express.json());
 
