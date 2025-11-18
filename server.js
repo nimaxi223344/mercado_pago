@@ -5,10 +5,32 @@ require('dotenv').config();
 
 const app = express();
 
+// ✅ CORS con protocolo correcto
 app.use(cors({
-  origin: [`${process.env.RAILWAY_FRONTEND_URL}`]
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    `https://${process.env.RAILWAY_FRONTEND_URL}`,
+    process.env.RAILWAY_FRONTEND_URL ? `https://${process.env.RAILWAY_FRONTEND_URL}` : null
+  ].filter(Boolean),
+  credentials: true
 }));
+
 app.use(express.json());
+
+// ✅ Endpoint raíz para verificar que el servidor funciona
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'MercadoPago Service is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// ✅ Endpoint de health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy' });
+});
 
 // Configurar MP
 const client = new MercadoPagoConfig({ 
@@ -117,7 +139,8 @@ app.post('/process-payment', async (req, res) => {
     });
   }
 });
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`🚀 MercadoPago Service running on http://localhost:${PORT}`);
+  console.log(`🚀 MercadoPago Service running on port ${PORT}`);
 });
